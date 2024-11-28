@@ -296,6 +296,7 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
         try {
             coordinate.put("latitude", routingPoint.getLatitude());
             coordinate.put("longitude", routingPoint.getLongitude());
+            position.put("coordinate", coordinate);
             position.put("floor", routingPoint.getFloor());
             obj.put("position", position);
             obj.put("nodeIndex", routingPoint.getNodeIndex());
