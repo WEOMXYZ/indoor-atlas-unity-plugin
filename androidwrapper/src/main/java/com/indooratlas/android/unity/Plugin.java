@@ -279,11 +279,15 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
     private static JSONObject jsonObjectFromRoutingLeg(IARoute.Leg routingLeg) {
         JSONObject obj = new JSONObject();
         try {
+            Integer edgeIndex = routingLeg.getEdgeIndex();
+
             obj.put("begin", jsonObjectFromRoutingPoint(routingLeg.getBegin()));
             obj.put("end", jsonObjectFromRoutingPoint(routingLeg.getEnd()));
             obj.put("length", routingLeg.getLength());
             obj.put("direction", routingLeg.getDirection());
-            obj.put("edgeIndex", routingLeg.getEdgeIndex());
+            // Unity class uses int and therefore null is automatically set to 0 which
+            // is not the intended behaviour as per comments in the Unity plugin.
+            obj.put("edgeIndex", edgeIndex == null ? -1 : edgeIndex);
         } catch(JSONException e) {
             Log.e(TAG, e.toString());
             throw new IllegalStateException(e.getMessage());
@@ -294,12 +298,16 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
     private static JSONObject jsonObjectFromRoutingPoint(IARoute.Point routingPoint) {
         JSONObject obj = new JSONObject(), position = new JSONObject(), coordinate = new JSONObject();
         try {
+            Integer nodeIndex = routingPoint.getNodeIndex();
+
             coordinate.put("latitude", routingPoint.getLatitude());
             coordinate.put("longitude", routingPoint.getLongitude());
             position.put("coordinate", coordinate);
             position.put("floor", routingPoint.getFloor());
             obj.put("position", position);
-            obj.put("nodeIndex", routingPoint.getNodeIndex());
+            // getNodeIndex returns null but in Unity it will get parsed to 0 as it a value type in c#.
+            // Changed it -1 so it matches the documentation and comments in the Unity plugin.
+            obj.put("nodeIndex", nodeIndex == null ? -1 : nodeIndex);
         } catch(JSONException e) {
             Log.e(TAG, e.toString());
             throw new IllegalStateException(e.getMessage());
